@@ -1,28 +1,30 @@
 'use strict';
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Bookmarks', {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('Asks', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      link: {
-        type: Sequelize.STRING
-      },
       title: {
         type: Sequelize.STRING
       },
-      search_words: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
+      preferred_price: {
+        type: Sequelize.STRING
+      },
+      description: {
+        type: Sequelize.STRING
+      },
+      photo: {
+        type: Sequelize.STRING
+      },
+      isActivate: {
+        type: Sequelize.BOOLEAN
       },
       UserId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Users',
-          key: 'id'
-        }
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
@@ -34,7 +36,7 @@ module.exports = {
       }
     });
   },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Bookmarks');
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Asks');
   }
 };
