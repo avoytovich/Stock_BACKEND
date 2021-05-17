@@ -1,4 +1,4 @@
-const { userController, loginController, bookmarkController } = require('./../controllers');
+const { userController } = require('./../controllers');
 
 module.exports =
   (app) => {
@@ -6,10 +6,9 @@ module.exports =
       message: 'Welcome'
     }));
 
-    app.post('/login', loginController.login);
-    app.get('/activation/:token', loginController.activation);
+    app.post('/signup', userController.signup);
+    app.post('/login', userController.login);
+    app.post('/user/:id/user_activate', userController.activation);
+    app.post('/user/:id/user_deactivate', userController.deactivation);
 
-    app.post('/user', userController.create);
-
-    app.post('/bookmark', bookmarkController.create);
   };
