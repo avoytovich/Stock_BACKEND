@@ -10,9 +10,9 @@ const secret = require('./config/jwt.secretkey');
 const jwt = require('jsonwebtoken');
 
 const token = req => req.headers['x-access-token'];
-const tokenFreeURLs = ['/login', '/user', '/activation'];
+const tokenFreeURLs = ['/login'];
 const checkURL = baseUrl => tokenFreeURLs.some(URL => baseUrl.match(URL));
-const verifyToken = (token, res, req, next) => jwt.verify(token, secret.key, (err, decoded) =>
+const verifyToken = (token, res, req, next) => jwt.verify(token, secret.KEY, (err, decoded) =>
   err && res.status(401).json({message: 'token is not valid'}) ||
   (req.decoded = decoded) && next()
 );
@@ -31,6 +31,8 @@ app.use('*', (req, res, next) => {
 });
 
 require('./routes')(app);
+
+require('dotenv').config();
 
 // Setup a default catch-all route that sends back a welcome message in JSON format.
 app.get('*', (req, res) => res.status(200).send({

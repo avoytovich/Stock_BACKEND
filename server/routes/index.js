@@ -6,7 +6,6 @@ module.exports =
       message: 'Welcome'
     }));
 
-    app.post('/signup', userController.signup);
     app.post('/login', userController.login);
     app.post('/user/:id/user_activate', userController.activation);
     app.post('/user/:id/user_deactivate', userController.deactivation);
