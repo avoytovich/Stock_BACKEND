@@ -1,53 +1,67 @@
-const passwordHash = require('password-hash');
-const jwt = require('jsonwebtoken');
+const passwordHash = require("password-hash");
+const jwt = require("jsonwebtoken");
 
-const secret = require('../config/jwt.secretkey');
-const constants = require('./../helper/constants');
-const { User } = require('./../models');
-const { user: messages } = require('./../helper/messages');
+const secret = require("../config/jwt.secretkey");
+const { User } = require("./../models");
+const { user: messages } = require("./../helper/messages");
 
 module.exports = {
-
-  signup(req, res) {
-    User.findOne({
-      where: {
-        email: req.body.email
-      }})
-        .then(user => {
-          user && passwordHash.verify(req.body.password, user.password) &&
-          res.status(400).json({message: messages.alreadyExist}) ||
-            User.create({
-              role: req.body.role,
-              username: req.body.username,
-              email: req.body.email,
-              password: passwordHash.generate(req.body.password),
-              isActivate: false
-            })
-              .then(user => {
-                res.status(200)
-                .json({message: messages.soonActivate});
-              });
-        })
-          .catch(error => res.status(404).send(error));
-  },
-
   login(req, res) {
     User.findOne({
       where: {
-        email: req.body.email
-      }
-    }).then(user => {
-      user && passwordHash.verify(req.body.password, user.password) && user.isActivated &&
-        res.status(200).json({
-          message: messages.successfulLogin,
-          token: jwt.sign({id: user.id}, secret.key, {expiresIn: constants.TIME_TOKEN})
-        }) ||
-      user && user.isActivated &&
-        res.status(400).json({message: messages.notValidPassword}) ||
-          user && !user.isActivated &&
-            res.status(400).json({message: messages.notActivated}) ||
-              !user && res.status(400).json({message: messages.notExist});
-    }).catch(error => res.status(401).send(error));
+        email: req.body.email,
+      },
+    })
+      .then((user) => {
+        if (user) {
+          if (passwordHash.verify(req.body.password, user.password)) {
+            if (user.isActivate) {
+              return res.status(200).json({
+                message: messages.successfulLogin,
+                token: jwt.sign({ id: user.id }, secret.KEY, {
+                  expiresIn: secret.TIME_TOKEN,
+                }),
+              });
+            } else if (!user.isActivated) {
+              return res.status(400).json({ message: messages.notActivated });
+            }
+          } else if (user.isActivated) {
+            return res.status(400).json({ message: messages.notValidPassword });
+          } else if (!user.isActivated) {
+            return res.status(400).json({ message: messages.notActivated });
+          }
+        } else {
+          if (req.body.email === process.env.ADMIN_EMAIL) {
+            User.create({
+              role: "admin",
+              username: null,
+              email: req.body.email,
+              password: passwordHash.generate(req.body.password),
+              isActivate: true,
+            }).then((user) =>
+              res.status(200).json({
+                message: messages.successfulLogin,
+                token: jwt.sign({ id: user.id }, secret.KEY, {
+                  expiresIn: secret.TIME_TOKEN,
+                }),
+              })
+            );
+          } else {
+            User.create({
+              role: "user",
+              username: null,
+              email: req.body.email,
+              password: passwordHash.generate(req.body.password),
+              isActivate: false,
+            }).then((user) =>
+              res.status(200).json({
+                message: messages.soonActivate,
+              })
+            );
+          }
+        }
+      })
+      .catch((error) => res.status(401).send(error));
   },
 
   activation(req, res) {
@@ -71,5 +85,4 @@ module.exports = {
       })
       .catch((error) => res.status(400).send(error));
   },
-
 };
