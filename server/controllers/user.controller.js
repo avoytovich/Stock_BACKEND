@@ -21,13 +21,14 @@ module.exports = {
                 token: jwt.sign({ id: user.id }, secret.KEY, {
                   expiresIn: secret.TIME_TOKEN,
                 }),
+                userId: user.id
               });
-            } else if (!user.isActivated) {
+            } else if (!user.isActivate) {
               return res.status(400).json({ message: messages.notActivated });
             }
-          } else if (user.isActivated) {
+          } else if (user.isActivate) {
             return res.status(400).json({ message: messages.notValidPassword });
-          } else if (!user.isActivated) {
+          } else if (!user.isActivate) {
             return res.status(400).json({ message: messages.notActivated });
           }
         } else {
@@ -44,6 +45,7 @@ module.exports = {
                 token: jwt.sign({ id: user.id }, secret.KEY, {
                   expiresIn: secret.TIME_TOKEN,
                 }),
+                userId: user.id
               })
             );
           } else {
@@ -68,7 +70,7 @@ module.exports = {
     User.findById(req.body.id)
       .then((user) => {
         user.update({
-          isActivated: true,
+          isActivate: true,
         });
         res.status(200).json({ message: messages.activated });
       })
@@ -79,7 +81,7 @@ module.exports = {
     User.findById(req.body.id)
       .then((user) => {
         user.update({
-          isActivated: false,
+          isActivate: false,
         });
         res.status(200).json({ message: messages.deactivated });
       })
