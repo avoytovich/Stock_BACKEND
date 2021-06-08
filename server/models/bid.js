@@ -21,8 +21,12 @@ module.exports = (sequelize, DataTypes) => {
   };
   Bid.init({
     title: DataTypes.STRING,
-    proposal: DataTypes.STRING,
     offered_price: DataTypes.STRING,
+    deadline: DataTypes.STRING,
+    payment_in_advance: DataTypes.BOOLEAN,
+    status: DataTypes.STRING,
+    requested_contact: DataTypes.STRING,
+    photo: DataTypes.STRING,
     UserId: DataTypes.INTEGER,
     AskId: DataTypes.INTEGER
   }, {
